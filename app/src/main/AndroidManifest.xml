@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    package="vp.com.watchrooms"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- To access Google+ APIs: -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect option is required to comply with the Google+ Sign-In developer policies -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <!-- To retrieve the account name (email) as part of sign-in: -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.READ_PROFILE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
+    <!-- for push notifications -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <permission
+        android:name="vp.com.watchrooms.permission.C2D_MESSAGE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="vp.com.watchrooms.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <!-- Login Activity -->
+        <activity
+            android:name=".activities.LoginActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
+
+        <activity
+            android:name=".activities.BuildingsActivity"
+            android:label="@string/title_activity_buildings">
+        </activity>
+
+        <activity
+            android:name=".activities.FloorsActivity"
+            android:label="@string/title_activity_floors">
+        </activity>
+
+        <activity
+            android:name=".activities.RoomsActivity"
+            android:label="@string/title_activity_rooms">
+        </activity>
+
+        <!-- Broadcast Receiver for Push Notifications -->
+        <receiver
+            android:name=".receivers.GcmBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+
+                <category android:name="vp.com.watchrooms"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- IntentService for push notifications -->
+        <service
+            android:name=".services.GcmIntentService"
+            android:exported="false"/>
+
+        <!--
+        <activity
+            android:name=".WatchRoomsLoginActivity"
+            android:label="@string/title_activity_watch_rooms_login" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        -->
+    </application>
+
+</manifest>
