@@ -26,5 +26,6 @@
     <string name="room_gender">male</string>
     <string name="subscription_switch_text">Subscription Status</string>
     <string name="subscription_toggle_text">Subscribe!</string>
+    <string name="room_status_toggle_text">room status</string>
 
 </resources>

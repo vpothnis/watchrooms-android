@@ -25,7 +25,7 @@ public class Room extends BaseModel {
     private boolean subscribed;
 
     public enum RoomStatus {
-        OCCUPIED, AVAILABLE, CLEANING_IN_ROGRESS
+        OCCUPIED, AVAILABLE, CLEANING_IN_PROGRESS
     }
 
     public Room() {

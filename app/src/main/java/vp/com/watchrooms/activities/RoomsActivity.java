@@ -46,12 +46,12 @@ public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.S
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new RoomsRecycleViewAdapter(this);
-
         // get the selected floor id
         Intent callingIntent = getIntent();
         String floorID = callingIntent.getStringExtra(CommonConstants.EXTRA_FLOOR_ID);
         currentUserJson = callingIntent.getStringExtra(CommonConstants.EXTRA_CURRENT_USER);
+
+        mAdapter = new RoomsRecycleViewAdapter(this, currentUserJson);
 
         if (!mRecyclerView.isInEditMode()) {
             // The Async Task will set the adapter to the recylcer view after it has downloaded the initial data

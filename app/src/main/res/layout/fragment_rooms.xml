@@ -55,4 +55,13 @@
         android:layout_below="@+id/room_id_text_view"
         android:text="@string/subscription_toggle_text"/>
 
+    <ToggleButton
+        android:id="@+id/room_status_toggle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/room_status_toggle_text"
+        android:layout_below="@+id/subscription_toggle_button"
+        android:layout_alignParentStart="true"
+        android:visibility="visible"/>
+
 </RelativeLayout>
