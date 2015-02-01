@@ -9,16 +9,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+
 import vp.com.watchrooms.CommonConstants;
 import vp.com.watchrooms.R;
-import vp.com.watchrooms.adapters.FloorsRecycleViewAdapter;
-import vp.com.watchrooms.async.AsyncFloorsTask;
+import vp.com.watchrooms.adapters.MySubscriptionsRecycleViewAdapter;
+import vp.com.watchrooms.async.AsyncMySubscriptionsTask;
+import vp.com.watchrooms.async.AsyncSubscriptionTask;
+import vp.com.watchrooms.models.Room;
+import vp.com.watchrooms.models.RoomList;
+import vp.com.watchrooms.models.User;
 
 import static java.lang.String.format;
 
-public class FloorsActivity extends Activity implements FloorsRecycleViewAdapter.FloorsClickListener {
+public class MySubscriptionsActivity extends Activity implements MySubscriptionsRecycleViewAdapter.SubscriptionToggleClickListener {
 
-    private static final String TAG = FloorsActivity.class.getSimpleName();
+    private static final String TAG = MySubscriptionsActivity.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -29,12 +37,9 @@ public class FloorsActivity extends Activity implements FloorsRecycleViewAdapter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_floors);
+        setContentView(R.layout.activity_my_subscriptions);
 
-        // set the title
-        getWindow().setTitle("Choose A Floor");
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.floors_recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_subscriptions_recycler_view);
 
         // use this setting to improve performance if you know that changes in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
@@ -43,16 +48,22 @@ public class FloorsActivity extends Activity implements FloorsRecycleViewAdapter
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new FloorsRecycleViewAdapter(this);
-
-        // get the selected building id
         Intent callingIntent = getIntent();
-        String buildingId = callingIntent.getStringExtra(CommonConstants.EXTRA_BUILDING_ID);
         currentUserJson = callingIntent.getStringExtra(CommonConstants.EXTRA_CURRENT_USER);
+        mAdapter = new MySubscriptionsRecycleViewAdapter(this, currentUserJson);
 
-        // The Async Task will set the adapter to the recylcer view after it has downloaded the initial data
-        AsyncFloorsTask floorsTask = new AsyncFloorsTask((FloorsRecycleViewAdapter) mAdapter, mRecyclerView, buildingId);
-        floorsTask.execute();
+        if (!mRecyclerView.isInEditMode()) {
+            // The Async Task will set the adapter to the recycler view after it has downloaded the initial data
+            AsyncMySubscriptionsTask subscriptionsTask = new AsyncMySubscriptionsTask((MySubscriptionsRecycleViewAdapter) mAdapter, mRecyclerView, currentUserJson);
+            subscriptionsTask.execute();
+        } else {
+            // set dummy data
+            RoomList dummyData = new RoomList();
+            dummyData.setCount(10L);
+            dummyData.addRoom(new Room("roomId", "floorId", "buildingId", "male", Room.RoomStatus.AVAILABLE));
+            ((MySubscriptionsRecycleViewAdapter) mAdapter).setRoomList(dummyData);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 
 
@@ -89,13 +100,15 @@ public class FloorsActivity extends Activity implements FloorsRecycleViewAdapter
 
 
     @Override
-    public void onFloorSelected(String floorId) {
-        Log.v(TAG, format("Trying to forward to Rooms Activity with floor id: [%s] selected", floorId));
+    public void onSubscriptionStatusChanged(String roomId, boolean subscribed) {
 
-        // start the Floors Activity
-        Intent intent = new Intent(getApplicationContext(), RoomsActivity.class);
-        intent.putExtra(CommonConstants.EXTRA_FLOOR_ID, floorId);
-        intent.putExtra(CommonConstants.EXTRA_CURRENT_USER, currentUserJson);
-        startActivity(intent);
+        // subscribe or unsubscribe the user for the status related to the room
+        try {
+            User currentUser = new ObjectMapper().readValue(currentUserJson, User.class);
+            AsyncSubscriptionTask subscriptionTask = new AsyncSubscriptionTask(currentUser.getUserId(), roomId, subscribed);
+            subscriptionTask.execute();
+        } catch (IOException e) {
+            Log.e(TAG, String.format("unable to change subscription status on room: [%s]", roomId));
+        }
     }
 }

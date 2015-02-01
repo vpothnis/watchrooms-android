@@ -18,11 +18,14 @@ import vp.com.watchrooms.R;
 import vp.com.watchrooms.adapters.RoomsRecycleViewAdapter;
 import vp.com.watchrooms.async.AsyncRoomsTask;
 import vp.com.watchrooms.async.AsyncSubscriptionTask;
+import vp.com.watchrooms.async.AsyncUpdateRoomStatusTask;
 import vp.com.watchrooms.models.Room;
 import vp.com.watchrooms.models.RoomList;
 import vp.com.watchrooms.models.User;
 
-public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.SubscriptionToggleClickListener {
+import static java.lang.String.format;
+
+public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.SubscriptionToggleClickListener, RoomsRecycleViewAdapter.RoomStatusToggleClickListener {
 
     private static final String TAG = RoomsActivity.class.getSimpleName();
 
@@ -51,7 +54,7 @@ public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.S
         String floorID = callingIntent.getStringExtra(CommonConstants.EXTRA_FLOOR_ID);
         currentUserJson = callingIntent.getStringExtra(CommonConstants.EXTRA_CURRENT_USER);
 
-        mAdapter = new RoomsRecycleViewAdapter(this, currentUserJson);
+        mAdapter = new RoomsRecycleViewAdapter(this, this, currentUserJson);
 
         if (!mRecyclerView.isInEditMode()) {
             // The Async Task will set the adapter to the recylcer view after it has downloaded the initial data
@@ -71,7 +74,7 @@ public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.S
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_buildings, menu);
+        getMenuInflater().inflate(R.menu.menu_common, menu);
         return true;
     }
 
@@ -82,8 +85,18 @@ public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.S
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_my_subscriptions) {
+            Log.v(TAG, format("Trying to forward to My Subscriptions Activity"));
+            Intent intent = new Intent(getApplicationContext(), MySubscriptionsActivity.class);
+            intent.putExtra(CommonConstants.EXTRA_CURRENT_USER, currentUserJson);
+            startActivity(intent);
+        } else if (id == R.id.action_signout) {
+            // signout
+        } else if (id == R.id.action_home) {
+            Log.v(TAG, format("Trying to forward to Buildings Activity"));
+            Intent intent = new Intent(getApplicationContext(), BuildingsActivity.class);
+            intent.putExtra(CommonConstants.EXTRA_CURRENT_USER, currentUserJson);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -93,7 +106,7 @@ public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.S
     @Override
     public void onSubscriptionStatusChanged(String roomId, boolean subscribed) {
 
-        // subscribe or unscubscribe the user for the status related to the room
+        // subscribe or unsubscribe the user for the status related to the room
         try {
             User currentUser = new ObjectMapper().readValue(currentUserJson, User.class);
             AsyncSubscriptionTask subscriptionTask = new AsyncSubscriptionTask(currentUser.getUserId(), roomId, subscribed);
@@ -101,5 +114,12 @@ public class RoomsActivity extends Activity implements RoomsRecycleViewAdapter.S
         } catch (IOException e) {
             Log.e(TAG, String.format("unable to change subscription status on room: [%s]", roomId));
         }
+    }
+
+    @Override
+    public void onRoomsStatusChanged(String roomId, Room.RoomStatus newRoomStatus) {
+        // change the status of the given room to the given status
+        AsyncUpdateRoomStatusTask updateRoomStatusTask = new AsyncUpdateRoomStatusTask(roomId, newRoomStatus);
+        updateRoomStatusTask.execute();
     }
 }

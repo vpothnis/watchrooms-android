@@ -1,7 +1,6 @@
 package vp.com.watchrooms.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,7 +45,7 @@ public class BuildingsActivity extends Activity implements BuildingsRecycleViewA
         Intent callingIntent = getIntent();
         currentUserJson = callingIntent.getStringExtra(CommonConstants.EXTRA_CURRENT_USER);
 
-        // The Async Task will set the adapter to the recylcer view after it has downloaded the initial data
+        // The Async Task will set the adapter to the recycler view after it has downloaded the initial data
         AsyncBuildingsTask buildingsTask = new AsyncBuildingsTask((BuildingsRecycleViewAdapter) mAdapter, mRecyclerView);
         buildingsTask.execute();
     }
@@ -55,7 +54,7 @@ public class BuildingsActivity extends Activity implements BuildingsRecycleViewA
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_buildings, menu);
+        getMenuInflater().inflate(R.menu.menu_common, menu);
         return true;
     }
 
@@ -66,10 +65,19 @@ public class BuildingsActivity extends Activity implements BuildingsRecycleViewA
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_my_subscriptions) {
+            Log.v(TAG, format("Trying to forward to My Subscriptions Activity"));
+            Intent intent = new Intent(getApplicationContext(), MySubscriptionsActivity.class);
+            intent.putExtra(CommonConstants.EXTRA_CURRENT_USER, currentUserJson);
+            startActivity(intent);
+        } else if (id == R.id.action_signout) {
+            // signout
+        } else if (id == R.id.action_home) {
+            Log.v(TAG, format("Trying to forward to Buildings Activity"));
+            Intent intent = new Intent(getApplicationContext(), BuildingsActivity.class);
+            intent.putExtra(CommonConstants.EXTRA_CURRENT_USER, currentUserJson);
+            startActivity(intent);
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -78,7 +86,6 @@ public class BuildingsActivity extends Activity implements BuildingsRecycleViewA
     @Override
     public void onBuildingSelect(String buildingId) {
         Log.v(TAG, format("Trying to forward to Floors Activity with building id: [%s] selected", buildingId));
-
         // start the Floors Activity
         Intent intent = new Intent(getApplicationContext(), FloorsActivity.class);
         intent.putExtra(CommonConstants.EXTRA_BUILDING_ID, buildingId);

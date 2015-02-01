@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">WatchRooms</string>
+    <string name="app_name">Welcome to WatchRooms!</string>
     <string name="welcome_text">Welcome to WatchRooms!</string>
     <string name="signin_info_text">Sign-In using Google</string>
     <string name="signin_alt_text"><![CDATA[OR\nRegister & Signing with your email id]]></string>
@@ -12,7 +12,7 @@
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
-    <string name="title_activity_buildings">Buildings</string>
+    <string name="title_activity_buildings">Select a building</string>
     <string name="building_address">building address</string>
     <string name="building_id">building id</string>
     <string name="building_name">building name</string>
@@ -21,11 +21,15 @@
     <string name="room_id">room id</string>
     <string name="floor_id">floor id</string>
     <string name="floor_name">floor name</string>
-    <string name="title_activity_floors">Floors</string>
+    <string name="title_activity_floors">Select a floor</string>
     <string name="title_activity_rooms">Rooms</string>
+    <string name="title_activity_my_subscriptions">My Subscriptions</string>
     <string name="room_gender">male</string>
     <string name="subscription_switch_text">Subscription Status</string>
     <string name="subscription_toggle_text">Subscribe!</string>
     <string name="room_status_toggle_text">room status</string>
+    <string name="action_my_subscriptions">My Subscriptions</string>
+    <string name="action_logout">Signout</string>
+    <string name="action_home">Home</string>
 
 </resources>

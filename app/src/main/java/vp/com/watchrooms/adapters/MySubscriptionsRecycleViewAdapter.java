@@ -22,17 +22,15 @@ import static java.lang.String.format;
 /**
  * Created by vinaypothnis on 2015-01-04.
  */
-public class RoomsRecycleViewAdapter extends RecyclerView.Adapter<RoomsListViewHolder> {
+public class MySubscriptionsRecycleViewAdapter extends RecyclerView.Adapter<RoomsListViewHolder> {
 
-    private static final String TAG = RoomsRecycleViewAdapter.class.getSimpleName();
+    private static final String TAG = MySubscriptionsRecycleViewAdapter.class.getSimpleName();
     private RoomList roomList;
     private SubscriptionToggleClickListener subscriptionClickListener;
-    private RoomStatusToggleClickListener roomStatusClickListener;
     private User currentUser = null;
 
-    public RoomsRecycleViewAdapter(SubscriptionToggleClickListener subscriptionListener, RoomStatusToggleClickListener roomStatusListener, String currentUserJson) {
+    public MySubscriptionsRecycleViewAdapter(SubscriptionToggleClickListener subscriptionListener, String currentUserJson) {
         this.subscriptionClickListener = subscriptionListener;
-        this.roomStatusClickListener = roomStatusListener;
         try {
             currentUser = new ObjectMapper().readValue(currentUserJson, User.class);
         } catch (IOException e) {
@@ -54,16 +52,7 @@ public class RoomsRecycleViewAdapter extends RecyclerView.Adapter<RoomsListViewH
      * Listen to subscription status changes and then call back so that the choice is persisted to db
      */
     public interface SubscriptionToggleClickListener {
-
         public void onSubscriptionStatusChanged(String roomId, boolean subscribed);
-    }
-
-    /**
-     * Listen to room status changes and then call back so that the room status is updated.
-     */
-    public interface RoomStatusToggleClickListener {
-
-        public void onRoomsStatusChanged(String roomId, Room.RoomStatus newRoomStatus);
     }
 
     @Override
@@ -96,36 +85,8 @@ public class RoomsRecycleViewAdapter extends RecyclerView.Adapter<RoomsListViewH
             }
         });
 
-        // the administrator's status toggle button
-        // Anything else => checked status = false
-        // Available => checked status = true
-        if (currentUser.getIsFacility()) {
-            // if the user is admin, then show the toggle button
-            viewHolder.mRoomStatusToggleButton.setVisibility(View.VISIBLE);
-
-            // set the appropriate text based on the current room status
-            if (Room.RoomStatus.CLEANING_IN_PROGRESS.equals(room.getCurrentStatus())) {
-                viewHolder.mRoomStatusToggleButton.setChecked(false);
-                viewHolder.mRoomStatusToggleButton.setText("Set Status To AVAILABLE");
-            } else {
-                viewHolder.mRoomStatusToggleButton.setChecked(true);
-                viewHolder.mRoomStatusToggleButton.setText("Set Status to CLEANING IN PROGRESS");
-            }
-        }
-        viewHolder.mRoomStatusToggleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                View parent = (View) v.getParent();
-                TextView roomIdView = (TextView) parent.findViewById(R.id.room_id_text_view);
-                ToggleButton roomStatusToggleButton = (ToggleButton) v;
-                boolean currentStatus = roomStatusToggleButton.isChecked();
-                Room.RoomStatus changeStatusTo = currentStatus ? Room.RoomStatus.AVAILABLE : Room.RoomStatus.CLEANING_IN_PROGRESS;
-                Log.i(TAG, format("User has chosen change status of room [%s] to [%s]", roomIdView.getText(), changeStatusTo));
-                roomStatusClickListener.onRoomsStatusChanged(roomIdView.getText().toString(), changeStatusTo);
-                String newStatus = currentStatus ? "Set Status to CLEANING IN PROGRESS" : "Set Status To AVAILABLE";
-                roomStatusToggleButton.setText(newStatus);
-            }
-        });
+        // make the status button invisible
+        viewHolder.mRoomStatusToggleButton.setVisibility(View.GONE);
 
     }
 
